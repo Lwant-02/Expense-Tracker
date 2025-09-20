@@ -1,4 +1,4 @@
-export interface Category {
+interface Category {
   id: string;
   name: string;
   color: string;
@@ -6,7 +6,7 @@ export interface Category {
   createdAt: Date;
 }
 
-export interface Expense {
+interface Expense {
   id: string;
   amount: number;
   description: string;
@@ -16,11 +16,11 @@ export interface Expense {
   updatedAt: Date;
 }
 
-export interface ExpenseWithCategory extends Expense {
+interface ExpenseWithCategory extends Expense {
   category: Category;
 }
 
-export interface ExpenseFilters {
+interface ExpenseFilters {
   categoryId?: string;
   dateFrom?: Date;
   dateTo?: Date;
@@ -29,10 +29,12 @@ export interface ExpenseFilters {
   sortOrder?: "asc" | "desc";
 }
 
-export interface ExpenseSummary {
+interface ExpenseSummary {
   totalExpenses: number;
   monthlyTotal: number;
   weeklyTotal: number;
+  monthlyTrend: number;
+  weeklyTrend: number;
   categoryBreakdown: Array<{
     categoryId: string;
     categoryName: string;
@@ -43,10 +45,10 @@ export interface ExpenseSummary {
   recentExpenses: ExpenseWithCategory[];
 }
 
-export interface DateRange {
+interface DateRange {
   from: Date;
   to: Date;
   label: string;
 }
 
-export type TimePeriod = "week" | "month" | "quarter" | "year" | "custom";
+type TimePeriod = "week" | "month" | "quarter" | "year" | "custom";

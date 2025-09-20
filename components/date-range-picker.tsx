@@ -12,7 +12,7 @@ import {
   subWeeks,
 } from "date-fns";
 import { cn } from "@/lib/utils";
-import { useExpenseStore } from "@/store/store";
+import { useAppStore } from "@/store/store";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -84,7 +84,7 @@ const presetRanges = [
 ];
 
 export function DateRangePicker() {
-  const { filters, setFilters } = useExpenseStore();
+  const { filters, setFilters } = useAppStore();
   const [selectedPreset, setSelectedPreset] = useState<string>("all");
   const [customRange, setCustomRange] = useState<DateRange | undefined>();
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);

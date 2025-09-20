@@ -1,7 +1,6 @@
 "use client";
 
 import { format } from "date-fns";
-import { ExpenseWithCategory } from "@/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
@@ -30,8 +29,8 @@ export function RecentExpenses({ expenses }: RecentExpensesProps) {
       <CardHeader>
         <CardTitle>Recent Expenses</CardTitle>
       </CardHeader>
-      <CardContent className="max-h-72 overflow-y-auto overflow-scroll">
-        <div className="space-y-4">
+      <CardContent className="max-h-80 overflow-y-auto overflow-scroll">
+        <div className="space-y-2">
           {expenses.map((expense) => (
             <div
               key={expense.id}
@@ -57,9 +56,7 @@ export function RecentExpenses({ expenses }: RecentExpensesProps) {
                 </div>
               </div>
               <div className="text-right">
-                <p className="font-semibold text-lg">
-                  ${expense.amount.toFixed(2)}
-                </p>
+                <p className="font-semibold">THB {expense.amount.toFixed(2)}</p>
               </div>
             </div>
           ))}
