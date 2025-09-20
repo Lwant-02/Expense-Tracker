@@ -2,11 +2,10 @@
 
 import { useState } from "react";
 import { Plus } from "lucide-react";
-import { CategoryList } from "@/components/category-list";
-import { CategoryForm } from "@/components/category-form";
+import { CategoryList } from "@/components/features/categories/components/category-list";
+import { CategoryForm } from "@/components/features/categories/components/category-form";
 import { Button } from "@/components/ui/button";
 
-import { Category } from "@/types";
 import { CustomDialog } from "@/components/custom-dialog";
 
 export default function CategoriesViewPage() {

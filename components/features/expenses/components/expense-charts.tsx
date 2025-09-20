@@ -2,18 +2,9 @@
 
 import { useMemo } from "react";
 import {
-  format,
-  startOfMonth,
-  endOfMonth,
-  eachMonthOfInterval,
-  subMonths,
-} from "date-fns";
-import {
   PieChart,
   Pie,
   Cell,
-  BarChart,
-  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -22,11 +13,16 @@ import {
   LineChart,
   Line,
 } from "recharts";
-import { useExpenseStore } from "@/store/store";
+import { format } from "date-fns";
+
+import {
+  getExpenseSummary,
+  getMonthlyChartData,
+  getWeeklyChartData,
+} from "@/lib/expense-utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export function CategoryPieChart() {
-  const { getExpenseSummary } = useExpenseStore();
   const summary = getExpenseSummary();
 
   const data = summary.categoryBreakdown.map((category) => ({
@@ -66,16 +62,26 @@ export function CategoryPieChart() {
               label={({ name, percent }) =>
                 `${name} ${(percent * 100).toFixed(0)}%`
               }
-              outerRadius={80}
+              outerRadius={120}
               fill="#8884d8"
               dataKey="value"
+              className="text-sm cursor-pointer"
             >
               {data.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={entry.color} />
               ))}
             </Pie>
             <Tooltip
-              formatter={(value) => [`$${Number(value).toFixed(2)}`, "Amount"]}
+              formatter={(value) => [
+                `THB ${Number(value).toFixed(2)}`,
+                "Amount",
+              ]}
+              contentStyle={{
+                backgroundColor: "#1f2937",
+                border: "1px solid #374151",
+                borderRadius: "6px",
+              }}
+              itemStyle={{ color: "#ffffff" }}
             />
           </PieChart>
         </ResponsiveContainer>
@@ -85,34 +91,9 @@ export function CategoryPieChart() {
 }
 
 export function MonthlyTrendChart() {
-  const { expenses } = useExpenseStore();
-
   const data = useMemo(() => {
-    const now = new Date();
-    const sixMonthsAgo = subMonths(now, 5);
-    const months = eachMonthOfInterval({ start: sixMonthsAgo, end: now });
-
-    return months.map((month) => {
-      const monthStart = startOfMonth(month);
-      const monthEnd = endOfMonth(month);
-
-      const monthlyExpenses = expenses.filter((expense) => {
-        const expenseDate =
-          expense.date instanceof Date ? expense.date : new Date(expense.date);
-        return expenseDate >= monthStart && expenseDate <= monthEnd;
-      });
-
-      const total = monthlyExpenses.reduce(
-        (sum, expense) => sum + expense.amount,
-        0
-      );
-
-      return {
-        month: format(month, "MMM yyyy"),
-        total,
-      };
-    });
-  }, [expenses]);
+    return getMonthlyChartData();
+  }, []);
 
   // Check if there's any data to display
   const hasData = data.some((item) => item.total > 0);
@@ -120,25 +101,28 @@ export function MonthlyTrendChart() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Monthly Spending Trend</CardTitle>
+        <CardTitle>6 Monthly Spending Trend</CardTitle>
       </CardHeader>
       <CardContent>
         {hasData ? (
           <ResponsiveContainer width="100%" height={300}>
             <LineChart
               data={data}
-              margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+              margin={{ top: 15, right: 30, left: 20, bottom: 5 }}
             >
               <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
               <XAxis dataKey="month" stroke="#9ca3af" fontSize={12} />
               <YAxis
                 stroke="#9ca3af"
                 fontSize={12}
-                tickFormatter={(value) => `$${value}`}
+                tickFormatter={(value) => `THB ${value}`}
               />
               <Tooltip
-                formatter={(value) => [`$${Number(value).toFixed(2)}`, "Total"]}
-                labelStyle={{ color: "#000" }}
+                formatter={(value) => [
+                  `THB ${Number(value).toFixed(2)}`,
+                  "Total",
+                ]}
+                labelStyle={{ color: "#eeeeee" }}
                 contentStyle={{
                   backgroundColor: "#1f2937",
                   border: "1px solid #374151",
@@ -170,52 +154,78 @@ export function MonthlyTrendChart() {
   );
 }
 
-export function CategoryBarChart() {
-  const { getExpenseSummary } = useExpenseStore();
-  const summary = getExpenseSummary();
+export const WeeklyTrendChart = () => {
+  const data = useMemo(() => {
+    return getWeeklyChartData();
+  }, []);
 
-  const data = summary.categoryBreakdown
-    .sort((a, b) => b.total - a.total)
-    .slice(0, 8)
-    .map((category) => ({
-      name: category.categoryName,
-      total: category.total,
-      color: category.color,
-    }));
-
-  if (data.length === 0) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Top Categories</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground text-center py-8">
-            No data to display
-          </p>
-        </CardContent>
-      </Card>
-    );
-  }
-
+  // Check if there's any data to display
+  const hasData = data.some((item) => item.total > 0);
+  const year = new Date().getFullYear();
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Top Categories</CardTitle>
+        <CardTitle>Weekly Spending Trend {year}</CardTitle>
       </CardHeader>
       <CardContent>
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={data} layout="horizontal">
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis type="number" />
-            <YAxis dataKey="name" type="category" width={100} />
-            <Tooltip
-              formatter={(value) => [`$${Number(value).toFixed(2)}`, "Total"]}
-            />
-            <Bar dataKey="total" fill="hsl(var(--primary))" />
-          </BarChart>
-        </ResponsiveContainer>
+        {hasData ? (
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart
+              data={data}
+              margin={{ top: 15, right: 30, left: 20, bottom: 5 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+              <XAxis
+                dataKey="date"
+                stroke="#9ca3af"
+                fontSize={12}
+                tickFormatter={(date) => {
+                  const d = new Date(date);
+                  return format(d, "EE dd MMM");
+                }}
+              />
+              <YAxis
+                stroke="#9ca3af"
+                fontSize={12}
+                tickFormatter={(value) => `THB ${value}`}
+              />
+              <Tooltip
+                formatter={(value) => [
+                  `THB ${Number(value).toFixed(2)}`,
+                  "Total",
+                ]}
+                labelStyle={{ color: "#eeeeee" }}
+                contentStyle={{
+                  backgroundColor: "#1f2937",
+                  border: "1px solid #374151",
+                  borderRadius: "6px",
+                }}
+                labelFormatter={(label) => {
+                  const d = new Date(label);
+                  return format(d, "EEE dd MMM");
+                }}
+              />
+              <Line
+                type="monotone"
+                dataKey="total"
+                stroke="#3b82f6"
+                strokeWidth={2}
+                dot={{ fill: "#3b82f6", strokeWidth: 2, r: 4 }}
+                activeDot={{ r: 6, stroke: "#3b82f6", strokeWidth: 2 }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        ) : (
+          <div className="flex items-center justify-center h-[300px] text-muted-foreground">
+            <div className="text-center">
+              <p className="text-lg font-medium">No expense data available</p>
+              <p className="text-sm">
+                Add some expenses to see the weekly trend
+              </p>
+            </div>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
-}
+};

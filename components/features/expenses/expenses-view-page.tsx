@@ -2,12 +2,10 @@
 
 import { useState } from "react";
 import { Plus } from "lucide-react";
-import { ExpenseDataTable } from "./expense-data-table";
-import { ExpenseFilters } from "./expense-filters";
-import { ExpenseForm } from "@/components/expense-form";
-import { Button } from "@/components/ui/button";
 
-import { ExpenseWithCategory } from "@/types";
+import { ExpenseList } from "@/components/features/expenses/components/expense-list";
+import { ExpenseForm } from "@/components/features/expenses/components/expense-form";
+import { Button } from "@/components/ui/button";
 import { CustomDialog } from "@/components/custom-dialog";
 
 export default function ExpensesViewPage() {
@@ -48,8 +46,7 @@ export default function ExpensesViewPage() {
         </Button>
       </div>
 
-      <ExpenseFilters />
-      <ExpenseDataTable onEditExpense={handleEditExpense} />
+      <ExpenseList onEditExpense={handleEditExpense} />
 
       {/* Add Expense Dialog */}
       <CustomDialog

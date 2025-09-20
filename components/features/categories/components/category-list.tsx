@@ -1,25 +1,19 @@
 "use client";
 
-import { MoreHorizontal, Edit, Trash2 } from "lucide-react";
-import { useExpenseStore } from "@/store/store";
-import { Category } from "@/types";
+import { DEMO_CATEGORIES, DEMO_EXPENSES } from "@/constants/demo-data";
 
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import CellAction from "@/components/cell-action";
+import { toast } from "sonner";
 
 interface CategoryListProps {
   onEditCategory?: (category: Category) => void;
 }
 
 export function CategoryList({ onEditCategory }: CategoryListProps) {
-  const { categories, deleteCategory, expenses } = useExpenseStore();
+  const categories = DEMO_CATEGORIES;
+  const expenses = DEMO_EXPENSES;
 
   const getCategoryExpenseCount = (categoryId: string) => {
     return expenses.filter((expense) => expense.categoryId === categoryId)
@@ -33,23 +27,12 @@ export function CategoryList({ onEditCategory }: CategoryListProps) {
   };
 
   const handleDeleteCategory = (categoryId: string) => {
-    const expenseCount = getCategoryExpenseCount(categoryId);
+    // const expenseCount = getCategoryExpenseCount(categoryId);
+    console.log(categoryId);
 
-    if (expenseCount > 0) {
-      if (
-        !confirm(
-          `This category has ${expenseCount} expense(s). Deleting it will also delete all associated expenses. Are you sure?`
-        )
-      ) {
-        return;
-      }
-    } else {
-      if (!confirm("Are you sure you want to delete this category?")) {
-        return;
-      }
-    }
-
-    deleteCategory(categoryId);
+    toast.success("Success!", {
+      description: "Your Category has been deleted successfully.",
+    });
   };
 
   return (
@@ -92,41 +75,18 @@ export function CategoryList({ onEditCategory }: CategoryListProps) {
                           </Badge>
                           {total > 0 && (
                             <span className="text-sm text-muted-foreground">
-                              ${total.toFixed(2)}
+                              THB {total.toFixed(2)}
                             </span>
                           )}
                         </div>
                       </div>
                     </div>
 
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="cursor-pointer"
-                        >
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        {onEditCategory && (
-                          <DropdownMenuItem
-                            onClick={() => onEditCategory(category)}
-                          >
-                            <Edit className="mr-2 h-4 w-4" />
-                            Edit
-                          </DropdownMenuItem>
-                        )}
-                        <DropdownMenuItem
-                          onClick={() => handleDeleteCategory(category.id)}
-                          className="text-destructive"
-                        >
-                          <Trash2 className="mr-2 h-4 w-4" />
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                    <CellAction
+                      data={category}
+                      onEdit={() => onEditCategory?.(category)}
+                      onDelete={handleDeleteCategory}
+                    />
                   </div>
                 </div>
               );

@@ -7,7 +7,7 @@ interface SummaryCardProps {
   description?: string;
   icon: LucideIcon;
   trend?: {
-    value: number;
+    value: string;
     isPositive: boolean;
   };
 }
@@ -41,7 +41,7 @@ export function SummaryCard({
               {trend.value}%
             </span>
             <span className="text-xs text-muted-foreground ml-1">
-              from last month
+              from last period
             </span>
           </div>
         )}

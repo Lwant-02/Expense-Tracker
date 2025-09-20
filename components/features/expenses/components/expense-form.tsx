@@ -5,8 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import { useExpenseStore } from "@/store/store";
-import { Expense } from "@/types";
+import { DEMO_CATEGORIES } from "@/constants/demo-data";
 import { expenseFormSchema, ExpenseFormData } from "@/lib/schemas";
 
 import { Button } from "@/components/ui/button";
@@ -33,6 +32,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { toast } from "sonner";
 
 interface ExpenseFormProps {
   expense?: Expense;
@@ -45,7 +45,7 @@ export function ExpenseForm({
   onSuccess,
   onCancel,
 }: ExpenseFormProps) {
-  const { categories, addExpense, updateExpense } = useExpenseStore();
+  const categories = DEMO_CATEGORIES;
 
   const form = useForm<ExpenseFormData>({
     resolver: zodResolver(expenseFormSchema),
@@ -59,19 +59,10 @@ export function ExpenseForm({
 
   const onSubmit = async (data: ExpenseFormData) => {
     try {
-      const expenseData = {
-        amount: parseFloat(data.amount),
-        description: data.description.trim(),
-        categoryId: data.categoryId,
-        date: data.date,
-      };
-
-      if (expense) {
-        updateExpense(expense.id, expenseData);
-      } else {
-        addExpense(expenseData);
-      }
-
+      toast.success("Success!", {
+        description: "Your Expense has been saved successfully.",
+      });
+      console.log(data);
       onSuccess?.();
     } catch (error) {
       console.error("Error saving expense:", error);
@@ -103,12 +94,12 @@ export function ExpenseForm({
               <FormControl>
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground">
-                    $
+                    THB
                   </span>
                   <Input
                     type="text"
                     placeholder="0.00"
-                    className="pl-8"
+                    className="pl-14"
                     {...field}
                     onChange={(e) =>
                       handleAmountChange(e.target.value, field.onChange)
@@ -209,17 +200,6 @@ export function ExpenseForm({
         />
 
         <div className="grid grid-cols-2 gap-4 justify-center items-center">
-          <Button
-            type="submit"
-            disabled={form.formState.isSubmitting}
-            className="cursor-pointer"
-          >
-            {form.formState.isSubmitting
-              ? "Saving..."
-              : expense
-              ? "Update Expense"
-              : "Add Expense"}
-          </Button>
           {onCancel && (
             <Button
               type="button"
@@ -231,6 +211,17 @@ export function ExpenseForm({
               Cancel
             </Button>
           )}
+          <Button
+            type="submit"
+            disabled={form.formState.isSubmitting}
+            className="cursor-pointer"
+          >
+            {form.formState.isSubmitting
+              ? "Saving..."
+              : expense
+              ? "Update Expense"
+              : "Add Expense"}
+          </Button>
         </div>
       </form>
     </Form>

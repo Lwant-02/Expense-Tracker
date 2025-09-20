@@ -2,8 +2,7 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useExpenseStore } from "@/store/store";
-import { Category } from "@/types";
+
 import { categoryFormSchema, CategoryFormData } from "@/lib/schemas";
 
 import { Button } from "@/components/ui/button";
@@ -16,6 +15,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { toast } from "sonner";
 
 interface CategoryFormProps {
   category?: Category;
@@ -70,8 +70,6 @@ export function CategoryForm({
   onSuccess,
   onCancel,
 }: CategoryFormProps) {
-  const { addCategory, updateCategory } = useExpenseStore();
-
   const form = useForm<CategoryFormData>({
     resolver: zodResolver(categoryFormSchema),
     defaultValues: {
@@ -83,18 +81,10 @@ export function CategoryForm({
 
   const onSubmit = async (data: CategoryFormData) => {
     try {
-      const categoryData = {
-        name: data.name.trim(),
-        color: data.color,
-        icon: data.icon,
-      };
-
-      if (category) {
-        updateCategory(category.id, categoryData);
-      } else {
-        addCategory(categoryData);
-      }
-
+      toast.success("Success!", {
+        description: "Your Category has been saved successfully.",
+      });
+      console.log(data);
       onSuccess?.();
     } catch (error) {
       console.error("Error saving category:", error);
@@ -180,17 +170,6 @@ export function CategoryForm({
         />
 
         <div className="grid grid-cols-2 gap-4 justify-center items-center">
-          <Button
-            type="submit"
-            disabled={form.formState.isSubmitting}
-            className="cursor-pointer"
-          >
-            {form.formState.isSubmitting
-              ? "Saving..."
-              : category
-              ? "Update Category"
-              : "Add Category"}
-          </Button>
           {onCancel && (
             <Button
               type="button"
@@ -202,6 +181,17 @@ export function CategoryForm({
               Cancel
             </Button>
           )}
+          <Button
+            type="submit"
+            disabled={form.formState.isSubmitting}
+            className="cursor-pointer"
+          >
+            {form.formState.isSubmitting
+              ? "Saving..."
+              : category
+              ? "Update Category"
+              : "Add Category"}
+          </Button>
         </div>
       </form>
     </Form>

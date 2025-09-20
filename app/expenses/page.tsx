@@ -1,4 +1,6 @@
+import { Suspense } from "react";
 import ExpensesViewPage from "@/components/features/expenses/expenses-view-page";
+import { Spinner } from "@/components/spinner";
 
 export const metadata = {
   title: "Expense Tracker | Expenses",
@@ -6,5 +8,9 @@ export const metadata = {
 };
 
 export default function ExpensesPage() {
-  return <ExpensesViewPage />;
+  return (
+    <Suspense fallback={<Spinner />}>
+      <ExpensesViewPage />
+    </Suspense>
+  );
 }
